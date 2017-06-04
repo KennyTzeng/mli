@@ -51,7 +51,7 @@ yacc.yacc()
 
 while True:
 	try:
-		s = raw_input('>>> ')
+		s = input('>>> ')
 	except EOFError:
 		break
 	yacc.parse(s)
