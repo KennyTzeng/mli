@@ -4,11 +4,15 @@
 # A simple calculator with variables.
 # -----------------------------------------------------------------------------
 
-tokens = (
+reserved = {
+	'if' : 'IF'
+}
+
+tokens = [
 	'NAME','NUMBER',
 	'PLUS','MINUS','TIMES','DIVIDE','EQUALS',
 	'LPAREN','RPAREN',
-	)
+	] + list(reserved.values())
 
 # Tokens
 
@@ -19,12 +23,17 @@ t_DIVIDE  = r'/'
 t_EQUALS  = r'='
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
-t_NAME    = r'[a-zA-Z_][a-zA-Z0-9_]*'
+# t_NAME    = r'[a-zA-Z_][a-zA-Z0-9_]*'
 
 def t_NUMBER(t):
 	r'\d+'
 	t.value = int(t.value)
 	return t
+
+def t_NAME(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value,'NAME')    # Check for reserved words
+    return t
 
 # Ignored characters
 t_ignore = " \t"
