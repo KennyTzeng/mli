@@ -38,8 +38,10 @@ t_RPAREN  = r'\)'
 # t_AND	  = r'and'
 # t_OR	  = r'or'
 # t_NOT	  = r'not'
-t_TRUE    = r'#t'
-t_FALSE   = r'#f'
+t_TRUE    = r'\#t'
+t_FALSE   = r'\#f'
+
+t_ignore = " \t"
 
 def t_ID(t):
 	r'[a-z]([a-z]|\d|-)*'
@@ -61,11 +63,35 @@ def t_error(t):
 precedence = ()
 
 # Yacc Grammar
+def p_expression_plus(p):
+	'exp_plus : LPAREN PLUS exp exps RPAREN'
+	if(isinstance(p[4], list)):
+		for i in p[4]:
+			p[3] = p[3] + i
+		print(p[3])
+	elif(isinstance(p[4], int)):
+		print(p[3] + p[4])
+
+def p_expression_more_1(p):
+	'exps : exps exp'
+	if isinstance(p[1], list):
+		p[1].append(p[2])
+		p[0] = p[1]
+		print(p[0])
+	elif isinstance(p[1], int):
+		p[0] = []
+		p[0].append(p[1])
+		p[0].append(p[2])
+		print(p[0])
+def p_expression_more_2(p):
+	'exps : exp'
+	p[0] = p[1]
+	print(p[0])
+
 def p_expression(p):
-	'''expression : GREATER
-				  | AND'''
-	print(p[1])
-	
+	'exp : NUMBER'
+	p[0] = p[1]
+
 def p_error(p):
 	# print("Syntax error at '%s'" % p.value)
 	print("yacc error")
