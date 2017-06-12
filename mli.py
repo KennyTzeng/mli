@@ -2,7 +2,7 @@
 # mli.py
 #
 # A miniLisp interpreter.
-# -----------------------------------------------------------------------------\
+# -----------------------------------------------------------------------------
 
 import ply.lex as lex
 import ply.yacc as yacc
@@ -14,7 +14,8 @@ reserved = {
 	'not' : 'NOT',
 	'define' : 'DEFINE',
 	'fun' : 'FUN',
-	'if' : 'IF'
+	'if' : 'IF',
+	'print-num' : 'print_num'
 }
 
 tokens = [
@@ -63,6 +64,25 @@ def t_error(t):
 precedence = ()
 
 # Yacc Grammar
+def p_program(p):
+	'program : stmt'
+	print("success !!")
+
+def p_stmt_1(p):
+	'stmt : exp'
+
+def p_stmt_2(p):
+	'stmt : print_stmt'
+
+def p_print_stmt_1(p):
+	'print_stmt : LPAREN print_num exp RPAREN'
+
+def p_exp_1(p):
+	'exp : num_op'
+
+def p_num_op_1(p):
+	'num_op : exp_plus'
+
 def p_expression_plus(p):
 	'exp_plus : LPAREN PLUS exp exps RPAREN'
 	if(isinstance(p[4], list)):
