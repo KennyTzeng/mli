@@ -64,6 +64,9 @@ def t_error(t):
 # Precedence
 precedence = ()
 
+# variables
+vars = {}
+
 # Yacc Grammar
 def p_program(p):
 	'program : stmt'
@@ -75,6 +78,9 @@ def p_stmt_exp(p):
 
 def p_stmt_print_stmt(p):
 	'stmt : print_stmt'
+
+def p_stmt_def_stmt(p):
+	'stmt : def_stmt'
 
 #PRINT-STMT
 def p_print_stmt_print_num(p):
@@ -115,6 +121,16 @@ def p_exp_logical_operation(p):
 	'exp : logical_op'
 	p[0] = p[1]
 
+def p_exp_if_exp(p):
+	'exp : if_exp'
+	p[0] = p[1]
+
+def p_exp_variable(p):
+	'exp : variable'
+	p[0] = vars.get(p[1])
+
+#/EXP --------------------------------------------------
+
 #NUM-OP
 def p_num_op(p):
 	'''num_op : exp_plus
@@ -133,10 +149,8 @@ def p_exp_plus(p):
 	if(isinstance(p[4], list)):
 		for i in p[4]:
 			p[3] = p[3] + i
-		# print(p[3])
 		p[0] = p[3]
 	elif(isinstance(p[4], int)):
-		# print(p[3] + p[4])
 		p[0] = p[3] + p[4]
 
 #EXP-MINUS
@@ -150,10 +164,8 @@ def p_exp_times(p):
 	if(isinstance(p[4], list)):
 		for i in p[4]:
 			p[3] = p[3] * i
-		# print(p[3])
 		p[0] = p[3]
 	elif(isinstance(p[4], int)):
-		# print(p[3] + p[4])
 		p[0] = p[3] * p[4]
 
 #EXP-DIVIDE
@@ -217,23 +229,57 @@ def p_not_op(p):
 	'not_op : LPAREN NOT exp RPAREN'
 	p[0] = not p[3]
 
+#/LOGICAL-OP -------------------------------------------
+
+#IF-EXP
+def p_if_exp(p):
+	'if_exp : LPAREN IF test_exp than_exp else_exp RPAREN'
+	if(p[3]):
+		p[0] = p[4]
+	else:
+		p[0] = p[5]
+
+def p_test_exp(p):
+	'test_exp : exp'
+	p[0] = p[1]
+
+def p_than_exp(p):
+	'than_exp : exp'
+	p[0] = p[1]
+
+def p_else_exp(p):
+	'else_exp : exp'
+	p[0] = p[1]
+
+#/IF-EXP -----------------------------------------------
+
+#DEFINE-STMT
+def p_def_stmt(p):
+	'def_stmt : LPAREN DEFINE variable exp RPAREN'
+	if(vars.get(p[3]) == None):
+		vars[p[3]] = p[4]
+
+def p_variable_id(p):
+	'variable : ID'
+	p[0] = p[1]
+
+
+#/DEFINE-STMT ------------------------------------------
+
 #EXPS
 def p_exps_1(p):
 	'exps : exps exp'
 	if isinstance(p[1], list):
 		p[0] = p[1]
 		p[0].append(p[2])
-		# print(p[0])
 	elif isinstance(p[1], int) or isinstance(p[1], bool):
 		p[0] = []
 		p[0].append(p[1])
 		p[0].append(p[2])
-		# print(p[0])
 
 def p_exps_2(p):
 	'exps : exp'
 	p[0] = p[1]
-	print(p[0])
 
 #Yacc error
 def p_error(p):
