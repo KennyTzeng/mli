@@ -111,8 +111,12 @@ def p_exp_number_operation(p):
 	'exp : num_op'
 	p[0] = p[1]
 
+def p_exp_logical_operation(p):
+	'exp : logical_op'
+	p[0] = p[1]
+
 #NUM-OP
-def p_num_op_1(p):
+def p_num_op(p):
 	'''num_op : exp_plus
 			  |	exp_minus
 			  | exp_times
@@ -172,6 +176,7 @@ def p_exp_smaller(p):
 	'exp_smaller : LPAREN SMALLER exp exp RPAREN'
 	p[0] = p[3] < p[4]
 
+#EXP-EQUALS
 def p_exp_equals(p):
 	'exp_equals : LPAREN EQUALS exp exps RPAREN'
 	if(isinstance(p[4], list)):
@@ -180,6 +185,38 @@ def p_exp_equals(p):
 	elif(isinstance(p[4], int)):
 		p[0] = p[3] == p[4]
 
+#/NUM-OP -----------------------------------------------
+
+#LOGICAL-OP
+def p_logical_op(p):
+	'''logical_op : and_op
+				  | or_op
+				  | not_op'''
+	p[0] = p[1]
+
+#AND-OP
+def p_and_op(p):
+	'and_op : LPAREN AND exp exps RPAREN'
+	if(isinstance(p[4], list)):
+		p[4].sort()
+		p[0] = p[3] and p[4][0] and p[4][-1]
+	elif(isinstance(p[4], bool)):
+		p[0] = p[3] and p[4]
+
+#OR-OP
+def p_or_op(p):
+	'or_op : LPAREN OR exp exps RPAREN'
+	if(isinstance(p[4], list)):
+		p[4].sort()
+		p[0] = p[3] or p[4][0] or p[4][-1]
+	elif(isinstance(p[4], bool)):
+		p[0] = p[3] or p[4]
+
+#NOT-OP
+def p_not_op(p):
+	'not_op : LPAREN NOT exp RPAREN'
+	p[0] = not p[3]
+
 #EXPS
 def p_exps_1(p):
 	'exps : exps exp'
@@ -187,7 +224,7 @@ def p_exps_1(p):
 		p[0] = p[1]
 		p[0].append(p[2])
 		# print(p[0])
-	elif isinstance(p[1], int):
+	elif isinstance(p[1], int) or isinstance(p[1], bool):
 		p[0] = []
 		p[0].append(p[1])
 		p[0].append(p[2])
