@@ -58,7 +58,7 @@ def t_NUMBER(t):
 	return t
 
 def t_error(t):
-	print("lex error")
+	print("syntax error")
 	t.lexer.skip(1)
 
 # Precedence
@@ -70,7 +70,7 @@ vars = {}
 # Yacc Grammar
 def p_program(p):
 	'program : stmts'
-	print("success !!")
+	#print("success !!")
 
 def p_stmts(p):
 	'''stmts : stmts stmt
@@ -132,6 +132,12 @@ def p_exp_if_exp(p):
 def p_exp_variable(p):
 	'exp : variable'
 	p[0] = vars.get(p[1])
+
+# fun_exp and fun_call can't work
+#def p_exp_fun_exp(p):
+#  	'exp : fun_exp'
+#def p_exp_fun_call(p):
+#	'exp : fun_call'
 
 #/EXP --------------------------------------------------
 
@@ -346,7 +352,7 @@ def p_exps_2(p):
 #Yacc error
 def p_error(p):
 	# print("Syntax error at '%s'" % p.value)
-	print("yacc error")
+	print("syntax error")
 
 #
 lex.lex()
