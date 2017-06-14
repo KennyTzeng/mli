@@ -48,13 +48,13 @@ t_ignore = " \t"
 def t_ID(t):
 	r'[a-z]([a-z]|\d|-)*'
 	t.type = reserved.get(t.value, 'ID')
-	print(t.type)
+	#print(t.type)
 	return t
 
 def t_NUMBER(t):
 	r'0|[1-9]\d*|-[1-9]\d*'
 	t.value = int(t.value)
-	print(t.type)
+	#print(t.type)
 	return t
 
 def t_error(t):
@@ -69,8 +69,12 @@ vars = {}
 
 # Yacc Grammar
 def p_program(p):
-	'program : stmt'
+	'program : stmts'
 	print("success !!")
+
+def p_stmts(p):
+	'''stmts : stmts stmt
+			 | stmt'''
 
 #STMT
 def p_stmt_exp(p):
@@ -263,8 +267,66 @@ def p_variable_id(p):
 	'variable : ID'
 	p[0] = p[1]
 
-
 #/DEFINE-STMT ------------------------------------------
+
+#IDS
+def p_ids_1(p):
+	'IDs : IDs ID'
+	if(isinstance(p[1], list)):
+		p[0] = p[1]
+		p[0].append(p[2])
+	elif(isinstance(p[1], str)):
+		p[0] = []
+		p[0].append(p[1])
+		p[0].append(p[2])
+
+def p_ids_2(p):
+	'IDs : ID'
+	p[0] = p[1]
+
+#/IDS --------------------------------------------------
+
+#FUN-EXP
+def p_fun_exp(p):
+	'fun_exp : LPAREN FUN fun_ids fun_body RPAREN'
+
+def p_fun_ids(p):
+	'fun_ids : LPAREN IDs RPAREN'
+
+def p_fun_body(p):
+	'fun_body : exp'
+
+#/FUN-EXP ----------------------------------------------
+#FUN-CALL
+def p_fun_call_exp(p):
+	'fun_call : LPAREN fun_exp params RPAREN'
+
+def p_fun_call_name(p):
+	'fun_call : LPAREN fun_name params RPAREN'
+
+def p_fun_name(p):
+	'fun_name : ID'
+	p[0] = p[1]
+
+def p_param(p):
+	'param : exp'
+	p[0] = p[1]
+
+def p_params_1(p):
+	'params : params param'
+	if(isinstance(p[1], list)):
+		p[0] = p[1]
+		p[0].append(p[2])
+	else:
+		p[0] = []
+		p[0].append(p[1])
+		p[0].append(p[2])
+
+def p_params_2(p):
+	'params : param'
+	p[0] = p[1]
+
+#/FUN-CALL ---------------------------------------------
 
 #EXPS
 def p_exps_1(p):
